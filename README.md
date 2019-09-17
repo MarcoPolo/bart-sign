@@ -1,4 +1,17 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Bart Station Sign
+
+A virtual bart station sign in your browser!
+
+## How this will work
+
+You'll pass in parameters as part of the url to specify your station and direction.
+
+`https://bart.marcopolo.io/woak/n` This means going North from West Oakland Bart
+`https://bart.marcopolo.io/woak/mont` This means going from West Oakland Bart to Montgomery St.
+
+It'll call the [bart api](http://api.bart.gov/docs/overview/examples.aspx) and fetch real-time estimates for the station and direction.
+
+It'll present that information in a cool way!
 
 ## Available Scripts
 
