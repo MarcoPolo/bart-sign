@@ -1,3 +1,9 @@
 #!/bin/bash
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$BRANCH" != "x" ]]; then
+  echo 'Not pushing to kbp since not on master';
+  exit 0;
+fi
+
 yarn build
 rsync -avzh build/ /keybase/private/marcopolo,sunmoyed,kbpbot/bart-sign/
