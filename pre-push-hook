@@ -1,0 +1,3 @@
+#!/bin/bash
+yarn build
+rsync -avzh public/ /keybase/private/marcopolo,sunmoyed,kbpbot/bart-sign/
