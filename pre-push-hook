@@ -1,3 +1,3 @@
 #!/bin/bash
 yarn build
-rsync -avzh public/ /keybase/private/marcopolo,sunmoyed,kbpbot/bart-sign/
+rsync -avzh build/ /keybase/private/marcopolo,sunmoyed,kbpbot/bart-sign/
