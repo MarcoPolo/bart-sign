@@ -25,7 +25,7 @@ console.log("My adder", myAdder(1, 2));
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 let bartPromise: Promise<Response> = fetch(
-  "http://api.bart.gov/api/etd.aspx?cmd=etd&dir=s&orig=WOAK&key=MW9S-E7SL-26DU-VV8V&json=y"
+  "https://api.bart.gov/api/etd.aspx?cmd=etd&dir=s&orig=WOAK&key=MW9S-E7SL-26DU-VV8V&json=y"
 );
 console.log(bartPromise);
 
@@ -78,5 +78,7 @@ bartPromise
 // 4. Allow out url pararmeters
 
 // https://bart.marcopolo.io/
+
+// http://qwantz.com/
 
 export default App;
