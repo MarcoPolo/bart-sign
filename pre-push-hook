@@ -1,6 +1,6 @@
 #!/bin/bash
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [[ "$BRANCH" != "x" ]]; then
+if [[ "$BRANCH" != "master" ]]; then
   echo 'Not pushing to kbp since not on master';
   exit 0;
 fi
