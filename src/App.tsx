@@ -65,7 +65,7 @@ bartPromise
       .map(train => train.estimate.map(etd => etd.minutes))
       .flat()
       .map(strMinutes => (strMinutes === "Leaving" ? 0 : parseInt(strMinutes)))
-      .sort();
+      .sort((a, b) => a - b);
 
     console.log("All estimates: ", allEstimatesForEveryTrain);
   });
