@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BartStation } from "./Stations";
 import "./App.css";
 
@@ -60,15 +60,42 @@ type BartStationETD = {
 //   }
 // }
 
+function useInterval(callback: () => void, delay: number) {
+  const savedCallback = useRef<Function>();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current && savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 const App: React.FC = () => {
   const [timeEstimates, setTimeEstimates] = useState<Array<number>>([]);
-  useEffect(() => {
+
+  const updateTrains = () => {
     allEstimatesForEveryTrain("woak", "s").then(
       (allEstimates: Array<number>) => {
         setTimeEstimates(allEstimates);
       }
     );
-  }, []);
+  };
+
+  // initial fetch without delay!
+  useEffect(updateTrains, []);
+
+  useInterval(updateTrains, 40 * 1000);
+
   console.log("Time estimates are", timeEstimates);
 
   const formattedTimeEstimates = timeEstimates.map(
