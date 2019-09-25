@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { BartStation } from "./Stations";
 import "./App.css";
 
+import happybart from "./happybart.png";
+
 type ETD = {
   length: string;
   minutes: string;
@@ -69,17 +71,37 @@ const App: React.FC = () => {
   }, []);
   console.log("Time estimates are", timeEstimates);
 
-  const formattedTimeEstimates = timeEstimates
-    .map((time: number) => `${time} minutes`)
-    .map((formattedString: string) => {
-      return <div>{formattedString}</div>;
-    });
+  const formattedTimeEstimates = timeEstimates.map(
+    (time: number, i: number) => {
+      const formattedString = `${time} minutes`;
+      const bartBarWidth = `calc(100% - ${5 * time}px)`;
+      return (
+        <div className="bart-row" key={i}>
+          <span className="time">{formattedString}</span>
+          <div className="bart-bar-background">
+            <div
+              className="bart-bar"
+              style={{
+                width: bartBarWidth
+              }}
+            >
+              <img
+                className="bart-icon"
+                src={happybart}
+                alt="bart, beep beep"
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+  );
 
   return (
     <div className="App">
       <header className="App-header">
         <p>Your next Bart train is leaving in </p>
-        {formattedTimeEstimates}
+        <div className="bart-times">{formattedTimeEstimates}</div>
       </header>
     </div>
   );
