@@ -7,6 +7,7 @@ import happybart from "./happybart.png";
 type ETD = {
   length: string;
   minutes: string;
+  hexcolor: string;
 };
 
 type BartLineETD = {
@@ -81,14 +82,12 @@ function useInterval(callback: () => void, delay: number) {
 }
 
 const App: React.FC = () => {
-  const [timeEstimates, setTimeEstimates] = useState<Array<number>>([]);
+  const [etds, setEtds] = useState<Array<ETD>>([]);
 
   const updateTrains = () => {
-    allEstimatesForEveryTrain("woak", "s").then(
-      (allEstimates: Array<number>) => {
-        setTimeEstimates(allEstimates);
-      }
-    );
+    allEtdsForEveryTrain("woak", "s").then((allEstimates: Array<ETD>) => {
+      setEtds(allEstimates);
+    });
   };
 
   // initial fetch without delay!
@@ -96,33 +95,33 @@ const App: React.FC = () => {
 
   useInterval(updateTrains, 40 * 1000);
 
-  console.log("Time estimates are", timeEstimates);
+  console.log("ETDs are", etds);
 
-  const formattedTimeEstimates = timeEstimates.map(
-    (time: number, i: number) => {
-      const formattedString = `${time} minutes`;
-      const bartBarWidth = `calc(100% - ${5 * time}px)`;
-      return (
-        <div className="bart-row" key={i}>
-          <span className="time">{formattedString}</span>
-          <div className="bart-bar-background">
-            <div
-              className="bart-bar"
-              style={{
-                width: bartBarWidth
-              }}
-            >
-              <img
-                className="bart-icon"
-                src={happybart}
-                alt="bart, beep beep"
-              />
-            </div>
+  const getMinutesFromETD = (etd: ETD) => {
+    return convertStrMinutesToNumMinutes(etd.minutes);
+  };
+
+  const formattedTimeEstimates = etds.map((etd: ETD, i: number) => {
+    const time = getMinutesFromETD(etd);
+    const formattedString = `${time} minutes`;
+    const bartBarWidth = `calc(100% - ${5 * time}px)`;
+    return (
+      <div className="bart-row" key={i}>
+        <span className="time">{formattedString}</span>
+        <div className="bart-bar-background">
+          <div
+            className="bart-bar"
+            style={{
+              width: bartBarWidth,
+              background: etd.hexcolor
+            }}
+          >
+            <img className="bart-icon" src={happybart} alt="bart, beep beep" />
           </div>
         </div>
-      );
-    }
-  );
+      </div>
+    );
+  });
 
   return (
     <div className="App">
@@ -137,10 +136,10 @@ const App: React.FC = () => {
 // http://api.bart.gov/api/etd.aspx?cmd=etd&dir=n&orig=WOAK&key=MW9S-E7SL-26DU-VV8V&json=y
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-const allEstimatesForEveryTrain = (
+const allEtdsForEveryTrain = (
   station: BartStation,
   direction: "s" | "n"
-): Promise<Array<number>> => {
+): Promise<ETD[]> => {
   console.log(`You want to leave from ${station} going ${direction}`);
   const bartPromise: Promise<Response> = fetch(
     `https://api.bart.gov/api/etd.aspx?cmd=etd&dir=${direction}&orig=${station}&key=MW9S-E7SL-26DU-VV8V&json=y`
@@ -159,18 +158,23 @@ const allEstimatesForEveryTrain = (
     })
     .then((bartStationETD: BartStationETD) => {
       const etdsForStation = bartStationETD.root.station[0].etd;
-      const allEstimatesForEveryTrain: Array<number> = etdsForStation
-        .map(train => train.estimate.map(etd => etd.minutes))
+      const allEtdsForEveryTrain: ETD[] = etdsForStation
+        .map(train => train.estimate)
         .flat()
-        .map(strMinutes =>
-          strMinutes === "Leaving" ? 0 : parseInt(strMinutes)
-        )
-        .sort((a, b) => a - b);
+        .sort(
+          (a, b) =>
+            convertStrMinutesToNumMinutes(a.minutes) -
+            convertStrMinutesToNumMinutes(b.minutes)
+        );
 
-      console.log("All estimates: ", allEstimatesForEveryTrain);
-      return allEstimatesForEveryTrain;
+      console.log("All etds: ", allEtdsForEveryTrain);
+      return allEtdsForEveryTrain;
     });
   return estimates;
+};
+
+const convertStrMinutesToNumMinutes = (strMinutes: string) => {
+  return strMinutes === "Leaving" ? 0 : parseInt(strMinutes);
 };
 
 // Overview
