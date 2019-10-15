@@ -97,10 +97,6 @@ const App: React.FC = () => {
 
   console.log("ETDs are", etds);
 
-  const getMinutesFromETD = (etd: ETD) => {
-    return convertStrMinutesToNumMinutes(etd.minutes);
-  };
-
   const formattedTimeEstimates = etds.map((etd: ETD, i: number) => {
     const time = getMinutesFromETD(etd);
     const formattedString = `${time} minutes`;
@@ -175,6 +171,10 @@ const allEtdsForEveryTrain = (
 
 const convertStrMinutesToNumMinutes = (strMinutes: string) => {
   return strMinutes === "Leaving" ? 0 : parseInt(strMinutes);
+};
+
+const getMinutesFromETD = (etd: ETD) => {
+  return convertStrMinutesToNumMinutes(etd.minutes);
 };
 
 // Overview
