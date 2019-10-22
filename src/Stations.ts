@@ -1,49 +1,51 @@
-export type BartStation =
-  | "12th"
-  | "16th"
-  | "19th"
-  | "24th"
-  | "ashb"
-  | "antc"
-  | "balb"
-  | "bayf"
-  | "cast"
-  | "civc"
-  | "cols"
-  | "colm"
-  | "conc"
-  | "daly"
-  | "dbrk"
-  | "dubl"
-  | "deln"
-  | "plza"
-  | "embr"
-  | "frmt"
-  | "ftvl"
-  | "glen"
-  | "hayw"
-  | "lafy"
-  | "lake"
-  | "mcar"
-  | "mlbr"
-  | "mont"
-  | "nbrk"
-  | "ncon"
-  | "oakl"
-  | "orin"
-  | "pitt"
-  | "pctr"
-  | "phil"
-  | "powl"
-  | "rich"
-  | "rock"
-  | "sbrn"
-  | "sfia"
-  | "sanl"
-  | "shay"
-  | "ssan"
-  | "ucty"
-  | "warm"
-  | "wcrk"
-  | "wdub"
-  | "woak";
+export type BartStation = typeof bartStations[number];
+export const bartStations = [
+  "12th",
+  "16th",
+  "19th",
+  "24th",
+  "ashb",
+  "antc",
+  "balb",
+  "bayf",
+  "cast",
+  "civc",
+  "cols",
+  "colm",
+  "conc",
+  "daly",
+  "dbrk",
+  "dubl",
+  "deln",
+  "plza",
+  "embr",
+  "frmt",
+  "ftvl",
+  "glen",
+  "hayw",
+  "lafy",
+  "lake",
+  "mcar",
+  "mlbr",
+  "mont",
+  "nbrk",
+  "ncon",
+  "oakl",
+  "orin",
+  "pitt",
+  "pctr",
+  "phil",
+  "powl",
+  "rich",
+  "rock",
+  "sbrn",
+  "sfia",
+  "sanl",
+  "shay",
+  "ssan",
+  "ucty",
+  "warm",
+  "wcrk",
+  "wdub",
+  "woak"
+] as const;

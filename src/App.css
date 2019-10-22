@@ -52,6 +52,13 @@
   white-space: nowrap;
 }
 
+.inline-select {
+  position: relative;
+  bottom: 2px;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
 @keyframes shake {
   10%,
   90% {

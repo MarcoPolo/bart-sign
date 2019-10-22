@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { BartStation } from "./Stations";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { BartStation, bartStations } from "./Stations";
 import "./App.css";
 
 import happybart from "./happybart.png";
@@ -81,17 +81,52 @@ function useInterval(callback: () => void, delay: number) {
   }, [delay]);
 }
 
+type LocationInfo = {
+  station: BartStation | undefined;
+  dir: "s" | "n" | undefined;
+};
+function hashToLocation(h: string): LocationInfo {
+  const [station, dir] = h.substr(1).split("/");
+  return { station: station as BartStation, dir: dir as any };
+}
+
+function useHashLocation(): [
+  LocationInfo,
+  (info: Partial<LocationInfo>) => void
+] {
+  const [location, setLocation] = useState(
+    hashToLocation(window.location.hash)
+  );
+  window.onhashchange = () => {
+    setLocation(hashToLocation(window.location.hash));
+  };
+
+  const changeLocation = useCallback(
+    (info: Partial<LocationInfo>) => {
+      info = { ...location, ...info };
+      window.location.hash = `${info.station}/${info.dir}`;
+    },
+    [location]
+  );
+
+  return [location, changeLocation];
+}
+
 const App: React.FC = () => {
+  const [location, changeLocation] = useHashLocation();
   const [etds, setEtds] = useState<Array<ETD>>([]);
+  console.log("Location is", location);
 
   const updateTrains = () => {
-    allEtdsForEveryTrain("woak", "s").then((allEstimates: Array<ETD>) => {
-      setEtds(allEstimates);
-    });
+    allEtdsForEveryTrain(location.station || "woak", location.dir || "s").then(
+      (allEstimates: Array<ETD>) => {
+        setEtds(allEstimates);
+      }
+    );
   };
 
   // initial fetch without delay!
-  useEffect(updateTrains, []);
+  useEffect(updateTrains, [location]);
 
   useInterval(updateTrains, 40 * 1000);
 
@@ -122,7 +157,37 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <p>Your next Bart train is leaving in </p>
+        <p>
+          Your next Bart train from
+          <select
+            name="station"
+            className="inline-select"
+            onChange={v => changeLocation({ station: v.target.value as any })}
+          >
+            <option value="woak">West Oakland</option>
+            {bartStations.map(station => (
+              <option
+                key={station}
+                value={station}
+                selected={station === location.station}
+              >
+                {station}
+              </option>
+            ))}
+          </select>
+          going
+          <select
+            name="dir"
+            className="inline-select"
+            onChange={v => changeLocation({ dir: v.target.value as any })}
+          >
+            <option value="s">south</option>
+            <option selected={location.dir === "n"} value="n">
+              north
+            </option>
+          </select>
+          is leaving in
+        </p>
         <div className="bart-times">{formattedTimeEstimates}</div>
       </header>
     </div>
