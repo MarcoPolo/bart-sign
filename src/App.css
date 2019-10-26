@@ -12,6 +12,11 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+.new-bart-btn {
+  min-width: 82px;
+}
+
 .bart-times {
   display: flex;
   flex-direction: column;

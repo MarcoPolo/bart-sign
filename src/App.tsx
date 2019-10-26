@@ -82,12 +82,15 @@ function useInterval(callback: () => void, delay: number) {
 }
 
 type LocationInfo = {
-  station: BartStation | undefined;
-  dir: "s" | "n" | undefined;
+  station: BartStation;
+  dir: "s" | "n";
 };
 function hashToLocation(h: string): LocationInfo {
   const [station, dir] = h.substr(1).split("/");
-  return { station: station as BartStation, dir: dir as any };
+  return {
+    station: (station || "woak") as BartStation,
+    dir: (dir || "s") as any
+  };
 }
 
 function useHashLocation(): [
@@ -112,6 +115,68 @@ function useHashLocation(): [
   return [location, changeLocation];
 }
 
+async function postData(url = "", data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, *cors, same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json"
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: "follow", // manual, *follow, error
+    referrer: "no-referrer", // no-referrer, *client
+    body: JSON.stringify(data) // body data type must match "Content-Type" header
+  });
+  return await response.json(); // parses JSON response into native JavaScript objects
+}
+
+const BartRow = ({
+  etd,
+  onSubmitNewBart
+}: {
+  etd: ETD;
+  onSubmitNewBart: (color: string) => void;
+}) => {
+  const time = getMinutesFromETD(etd);
+  const formattedString = `${time} minutes`;
+  const bartBarWidth = `calc(100% - ${5 * time}px)`;
+  const [submittedNewBart, setSubmittedNewBart] = useState(false);
+  return (
+    <div className="bart-row">
+      <span className="time">{formattedString}</span>
+      <div className="bart-bar-background">
+        <div
+          className="bart-bar"
+          style={{
+            width: bartBarWidth,
+            background: etd.hexcolor
+          }}
+        >
+          <img className="bart-icon" src={happybart} alt="bart, beep beep" />
+        </div>
+      </div>
+      <button
+        type="button"
+        className="new-bart-btn"
+        onClick={async () => {
+          setSubmittedNewBart(true);
+          try {
+            await onSubmitNewBart(etd.hexcolor);
+          } catch (e) {
+            setSubmittedNewBart(false);
+          }
+        }}
+        disabled={submittedNewBart}
+      >
+        {submittedNewBart ? "Thanks!" : "New Bart!"}
+      </button>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [location, changeLocation] = useHashLocation();
   const [etds, setEtds] = useState<Array<ETD>>([]);
@@ -132,27 +197,19 @@ const App: React.FC = () => {
 
   console.log("ETDs are", etds);
 
-  const formattedTimeEstimates = etds.map((etd: ETD, i: number) => {
-    const time = getMinutesFromETD(etd);
-    const formattedString = `${time} minutes`;
-    const bartBarWidth = `calc(100% - ${5 * time}px)`;
-    return (
-      <div className="bart-row" key={i}>
-        <span className="time">{formattedString}</span>
-        <div className="bart-bar-background">
-          <div
-            className="bart-bar"
-            style={{
-              width: bartBarWidth,
-              background: etd.hexcolor
-            }}
-          >
-            <img className="bart-icon" src={happybart} alt="bart, beep beep" />
-          </div>
-        </div>
-      </div>
-    );
-  });
+  const formattedTimeEstimates = etds.map((etd: ETD, i: number) => (
+    <BartRow
+      etd={etd}
+      onSubmitNewBart={async (color: string) => {
+        await postData("https://exec.clay.run/marco/mark-new-train", {
+          Station: location.station,
+          Direction: location.dir,
+          LineColor: color
+        });
+      }}
+      key={i}
+    />
+  ));
 
   return (
     <div className="App">
@@ -211,7 +268,6 @@ const allEtdsForEveryTrain = (
     .then((resp: Response) => {
       if (resp.ok) {
         // https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-        console.log("I have the response!");
         return resp.json();
       } else {
         throw new Error("I didn't get the info from bart :(");
