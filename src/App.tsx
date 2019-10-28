@@ -201,10 +201,10 @@ const App: React.FC = () => {
     <BartRow
       etd={etd}
       onSubmitNewBart={async (color: string) => {
-        await postData("https://exec.clay.run/marco/mark-new-train", {
-          Station: location.station,
-          Direction: location.dir,
-          LineColor: color
+        await postData("https://marco-new-barts.builtwithdark.com/report", {
+          station: location.station,
+          direction: location.dir,
+          lineColor: color
         });
       }}
       key={i}
