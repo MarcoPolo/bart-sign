@@ -25,6 +25,36 @@ type BartStationETD = {
   };
 };
 
+type TrainStatus = {
+  eta_mins: number,
+  car_count: number,
+  is_new_boi: boolean,
+}
+
+type LineStatus = {
+  trains: Array<TrainStatus>
+  destination: string,
+  // Note this is a color like "Blue" not a hex code. See this for the conversion: https://en.wikipedia.org/wiki/Module:Adjacent_stations/BART
+  color: string
+}
+
+type StatinStatus = {
+  platforms: Array<{
+    platform_number: number,
+    lines: Array<LineStatus>
+  }>
+}
+
+// Example call to the new api
+async function exampleFruitBart(station: BartStation) {
+  let resp = await fetch(`https://bart.fruit.dev/info?station=${station}`)
+  let stationStatus = await resp.json()
+  // let stationStatus = await fetch(`https://api.fruit.dev/v1/bart?station=${station}`)
+  console.log("Station status is", stationStatus)
+}
+
+exampleFruitBart("woak")
+
 // class AppClassStyle extends React.Component {
 //   state: { estimates: Array<number> } = { estimates: [] };
 //   componentDidMount() {
